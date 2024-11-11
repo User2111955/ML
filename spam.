@@ -1,0 +1,41 @@
+import numpy as np 
+import pandas as pd
+
+
+df=pd.read_csv('spam.csv',encoding='ISO-8859-1')
+df
+
+df.groupby('v1').describe()
+df.shape
+
+df['spam']=df['v1'].apply(lambda x:1 if x=='spam' else 0)
+df.head()
+
+new_df=df[['v1','v2','spam']]
+new_df.head()
+
+from sklearn.model_selection import train_test_split
+x_train,x_test,y_train,y_test=train_test_split(df.v2,df.spam)
+from sklearn.feature_extraction.text import CountVectorizer
+v=CountVectorizer()
+x_train_count=v.fit_transform(x_train.values)
+x_train_count.toarray()[:2]
+
+print(v)
+print(df.v2)
+print(df.spam)
+
+from sklearn.naive_bayes import MultinomialNB
+model=MultinomialNB()
+model.fit(x_train_count,y_train)
+
+emails=["How are you brother?", "Free entry"]
+email_count=v.transform(emails)
+model.predict(email_count)
+
+emails=["Free entry in 2 a wkly comp to win FA Cup"]
+email_count=v.transform(emails)
+model.predict(email_count)
+
+x_test_count=v.transform(x_test)
+model.score(x_test_count,y_test)
