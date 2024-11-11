@@ -1,0 +1,78 @@
+import pandas as pd
+from mlxtend.frequent_patterns import apriori, association_rules
+import matplotlib.pyplot as plt
+
+# Load the dataset
+data = pd.read_csv('Market_Basket_Optimisation.csv', header=None)
+
+# Data Preprocessing
+transactions = []
+for i in range(0, data.shape[0]):
+    transaction = [str(data.values[i, j]) for j in range(0, data.shape[1]) if str(data.values[i, j]) != 'nan']
+    transactions.append(transaction)
+
+# Create a DataFrame with binary values for each item
+from mlxtend.preprocessing import TransactionEncoder
+
+te = TransactionEncoder()
+te_ary = te.fit(transactions).transform(transactions)
+df = pd.DataFrame(te_ary, columns=te.columns_)
+
+# Train Apriori Algorithm on the dataset
+frequent_itemsets = apriori(df, min_support=0.01, use_colnames=True)
+
+# Generate the association rules
+#rules = association_rules(frequent_itemsets, metric='confidence', min_threshold=0.2)
+# Generate the association rules
+rules = association_rules(frequent_itemsets, metric='confidence', min_threshold=0.2, num_itemsets=len(frequent_itemsets))
+
+# Display the rules
+print("Association Rules:")
+print(rules)
+
+# Visualize the rules
+plt.scatter(rules['support'], rules['confidence'], alpha=0.5)
+plt.xlabel('Support')
+plt.ylabel('Confidence')
+plt.title('Support vs Confidence')
+plt.show()
+
+# Increase minimum confidence and display new rules
+rules_high_confidence = association_rules(frequent_itemsets, metric='confidence', min_threshold=0.5 , num_itemsets=len(frequent_itemsets))
+print("Association Rules with Higher Confidence:")
+print(rules_high_confidence)
+
+
+
+import pandas as pd
+from mlxtend.frequent_patterns import apriori, association_rules
+
+# Create a simple dataset (toy example)
+data = {
+    'milk': [1, 1, 1, 0, 0],
+    'bread': [1, 1, 0, 1, 1],
+    'butter': [0, 1, 1, 1, 1],
+    'jam': [0, 1, 0, 0, 1],
+    'cereal': [1, 0, 0, 1, 1]
+}
+
+# Convert dictionary to a DataFrame
+df = pd.DataFrame(data)
+
+# Display the dataset
+print("Dataset:")
+print(df)
+
+# Apply the Apriori algorithm to find frequent itemsets with minimum support of 0.6
+frequent_itemsets = apriori(df, min_support=0.6, use_colnames=True)
+
+# Display the frequent itemsets
+print("\nFrequent Itemsets:")
+print(frequent_itemsets)
+
+# Generate association rules with a minimum confidence of 0.7
+rules = association_rules(frequent_itemsets, metric='confidence', min_threshold=0.7 , num_itemsets=len(frequent_itemsets))
+
+# Display the rules
+print("\nAssociation Rules:")
+print(rules)
